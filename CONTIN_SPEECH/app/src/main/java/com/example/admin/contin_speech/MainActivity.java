@@ -72,8 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void AddPermission() {
         int permissionStatus= ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
 
-        String[] arr = {""};
-        arr[0] = Manifest.permission.RECORD_AUDIO;
+        String[] arr = {Manifest.permission.RECORD_AUDIO};
 
         if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arr,
