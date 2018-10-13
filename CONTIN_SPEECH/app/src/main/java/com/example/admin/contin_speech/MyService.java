@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -36,6 +37,8 @@ public class MyService extends Service {
     static final int MSG_RECOGNIZER_CANCEL = 2;
 
     private String MESSAGE= "";
+
+    private final LocalBinder mLocalBinder = new LocalBinder();
 
     @Override
     public void onCreate() {
@@ -106,7 +109,7 @@ public class MyService extends Service {
     }
 
     // Count down timer for Jelly Bean work around
-    protected CountDownTimer mNoSpeechCountDown = new CountDownTimer(50000, 5000)
+    protected CountDownTimer mNoSpeechCountDown = new CountDownTimer(60 * 1000, 5000)
     {
 
         @Override
@@ -182,6 +185,7 @@ public class MyService extends Service {
 
         @Override
         public void onError(int error)
+
         {
             if (mIsCountDownOn)
             {
@@ -257,9 +261,13 @@ public class MyService extends Service {
 
     }
 
+    public String getMESSAGE(){
+        return this.MESSAGE;
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mLocalBinder;
     }
 
     @Override
@@ -267,6 +275,14 @@ public class MyService extends Service {
         return super.onUnbind(i);
 
     }
+
+    public class LocalBinder extends Binder {
+        public MyService getService() {
+            return MyService.this;
+        }
+    }
+
+
 
     private void sendMessageToActivity(String msg){
         Intent intent = new Intent("intentKey");
