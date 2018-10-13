@@ -52,7 +52,7 @@ public class MyService extends Service {
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
                 this.getPackageName());
 
-        //Log.d("test-service", "onCreate"); //$NON-NLS-1$
+
         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
     }
 
@@ -81,7 +81,7 @@ public class MyService extends Service {
                         if (!mIsStreamSolo)
                         {
                             mAudioManager.setStreamSolo(AudioManager.STREAM_VOICE_CALL, true);
-                            //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
+                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
                             mIsStreamSolo = true;
                         }
                     }
@@ -97,7 +97,7 @@ public class MyService extends Service {
                     if (mIsStreamSolo)
                     {
                         mAudioManager.setStreamSolo(AudioManager.STREAM_VOICE_CALL, false);
-                        //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,5,0);
+                        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,5,0);
                         mIsStreamSolo = false;
                     }
                     target.mSpeechRecognizer.cancel();
@@ -261,8 +261,16 @@ public class MyService extends Service {
 
     }
 
+    public boolean ismIsCountDownOn(){
+        return mIsCountDownOn;
+    }
+
     public String getMESSAGE(){
         return this.MESSAGE;
+    }
+
+    public void setMESSAGE(String MESSAGE) {
+        this.MESSAGE = MESSAGE;
     }
 
     @Override
@@ -272,8 +280,9 @@ public class MyService extends Service {
 
     @Override
     public boolean onUnbind(Intent i) {
+        Log.d("testService","onUnbind!!");
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,5,0);
         return super.onUnbind(i);
-
     }
 
     public class LocalBinder extends Binder {
