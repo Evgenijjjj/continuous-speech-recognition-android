@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnStop = (Button)findViewById(R.id.btnStop);
         textView = (TextView)findViewById(R.id.textView);
 
+        btnStop.setVisibility(View.INVISIBLE);
+
         btnStart.setOnClickListener(this);
         btnStop.setOnClickListener(this);
 
@@ -56,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnStart){
+            btnStop.setVisibility(View.VISIBLE);
+            btnStart.setVisibility(View.INVISIBLE);
+
             Toast.makeText(this,"Recognizing start",Toast.LENGTH_SHORT).show();
             try{
                 taskServiceAnswer = new TaskServiceAnswer();
@@ -66,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(v.getId() == R.id.btnStop){
             if (taskServiceAnswer != null) {
+                btnStart.setVisibility(View.VISIBLE);
+                btnStop.setVisibility(View.INVISIBLE);
+
                 Toast.makeText(this,"Recognizing stop",Toast.LENGTH_SHORT).show();
                 mService.setMESSAGE("");
                 taskServiceAnswer.setEXECUTE_FLAG(false);
