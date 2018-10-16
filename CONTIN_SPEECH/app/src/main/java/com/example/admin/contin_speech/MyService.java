@@ -109,7 +109,7 @@ public class MyService extends Service {
     }
 
     // Count down timer for Jelly Bean work around
-    protected CountDownTimer mNoSpeechCountDown = new CountDownTimer(60 * 1000, 5000)
+    protected CountDownTimer mNoSpeechCountDown = new CountDownTimer(5000, 5000)
     {
 
         @Override

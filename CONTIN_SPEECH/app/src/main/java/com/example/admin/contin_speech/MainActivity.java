@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +21,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,11 +35,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btnStart, btnStop;
     TextView textView;
     Intent intent;
-
     MyService mService;
     boolean mBound = false;
-
+    ProgressBar progressBar;
     TaskServiceAnswer taskServiceAnswer = null;
+    AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnStart = (Button)findViewById(R.id.btnStart);
         btnStop = (Button)findViewById(R.id.btnStop);
         textView = (TextView)findViewById(R.id.textView);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+
+        audioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
 
         btnStop.setVisibility(View.INVISIBLE);
 
@@ -58,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnStart){
+            audioManager.setMicrophoneMute(false);
+
             btnStop.setVisibility(View.VISIBLE);
             btnStart.setVisibility(View.INVISIBLE);
 
@@ -65,21 +74,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try{
                 taskServiceAnswer = new TaskServiceAnswer();
                 taskServiceAnswer.execute();
+                mService.setMESSAGE("");
             }catch (Exception e ){
                 Log.d("testServiceEE",e.toString() + "\n" + taskServiceAnswer.getStatus().toString());
             }
         }
-        if(v.getId() == R.id.btnStop){
-            if (taskServiceAnswer != null) {
-                btnStart.setVisibility(View.VISIBLE);
-                btnStop.setVisibility(View.INVISIBLE);
 
-                Toast.makeText(this,"Recognizing stop",Toast.LENGTH_SHORT).show();
-                mService.setMESSAGE("");
-                taskServiceAnswer.setEXECUTE_FLAG(false);
-                taskServiceAnswer.cancel(false);
-                //taskServiceAnswer = null;
-                textView.setText("Tap start button to execute speech recognizing");
+        if(v.getId() == R.id.btnStop){
+            audioManager.setMicrophoneMute(true);
+            if (taskServiceAnswer != null) {
+                Toast.makeText(this,"Speech Analysis Ends, Please Wait",Toast.LENGTH_SHORT).show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        btnStart.setVisibility(View.VISIBLE);
+                        btnStop.setVisibility(View.INVISIBLE);
+
+
+
+                        Toast.makeText(getBaseContext(),"Recognizing stop",Toast.LENGTH_SHORT).show();
+                        taskServiceAnswer.setEXECUTE_FLAG(false);
+                        taskServiceAnswer.cancel(false);
+                    }
+                }, 2000);
             }
         }
     }
@@ -118,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    class TaskServiceAnswer extends AsyncTask<Void,Void,Void>{
+    protected class TaskServiceAnswer extends AsyncTask<Void,Void,Void>{
         private boolean EXECUTE_FLAG = true;
 
         @Override
@@ -153,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected Void doInBackground(Void... voids) {
             while(EXECUTE_FLAG) {
                 try {
-                    TimeUnit.MILLISECONDS.sleep(200);
+                    TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
